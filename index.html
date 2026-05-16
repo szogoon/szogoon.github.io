@@ -60,6 +60,17 @@
       font-size: 15px;
       line-height: 1.7;
     }
+
+    /* shared content styles */
+    .comment  { color: #6e7681; }
+    .prompt   { color: #3fb950; }
+    .cmd      { color: #c9d1d9; }
+    .divider  { border: none; border-top: 1px solid #21262d; margin: 16px 0; }
+    .line     { margin: 10px 0; }
+
+    /* whoami output */
+    .name  { color: #58a6ff; font-size: 22px; font-weight: bold; display: block; margin: 2px 0; }
+    .title { color: #8b949e; display: block; }
   </style>
 </head>
 <body>
@@ -71,7 +82,16 @@
       <span class="titlebar-label">~  —  bash</span>
     </div>
     <div class="body">
-      <!-- content goes here -->
+      <div class="line"><span class="comment"># welcome to my corner of the internet</span></div>
+
+      <div class="line">
+        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">whoami</span>
+      </div>
+      <span class="name">Przemysław Małolepszy</span>
+      <span class="title">Full Stack Software Engineer</span>
+
+      <hr class="divider">
+      <!-- about goes here -->
     </div>
   </div>
 </body>
