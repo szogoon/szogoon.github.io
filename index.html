@@ -75,6 +75,25 @@
     /* about output */
     .bio { color: #c9d1d9; display: block; margin: 2px 0; }
     .bio-gap { margin-top: 8px; }
+
+    /* skills tags */
+    .tags { margin: 4px 0; }
+
+    .tag {
+      display: inline-block;
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      font-size: 12px;
+      padding: 1px 8px;
+      border-radius: 4px;
+      margin: 2px 3px 2px 0;
+    }
+
+    .tag-primary {
+      border-color: #3fb950;
+      color: #3fb950;
+    }
   </style>
 </head>
 <body>
@@ -107,7 +126,24 @@
       <span class="bio">them, and know what happens when they break.</span>
 
       <hr class="divider">
-      <!-- skills goes here -->
+      <div class="line">
+        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">cat skills.txt</span>
+      </div>
+      <div class="tags">
+        <span class="tag tag-primary">Go</span>
+        <span class="tag tag-primary">TypeScript</span>
+        <span class="tag tag-primary">Azure</span>
+        <span class="tag">Linux</span>
+        <span class="tag">Windows Server</span>
+        <span class="tag">Active Directory</span>
+        <span class="tag">MySQL</span>
+        <span class="tag">Postfix</span>
+        <span class="tag">Exchange</span>
+        <span class="tag">Postman</span>
+      </div>
+
+      <hr class="divider">
+      <!-- links goes here -->
     </div>
   </div>
 </body>
