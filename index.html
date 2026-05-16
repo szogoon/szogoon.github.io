@@ -94,6 +94,32 @@
       border-color: #3fb950;
       color: #3fb950;
     }
+
+    /* links */
+    .links { margin-top: 4px; display: flex; gap: 24px; flex-wrap: wrap; }
+
+    .links a {
+      color: #3fb950;
+      text-decoration: none;
+    }
+
+    .links a:hover { color: #58a6ff; }
+
+    /* blinking cursor */
+    .cursor {
+      display: inline-block;
+      width: 9px;
+      height: 16px;
+      background: #58a6ff;
+      vertical-align: text-bottom;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -142,8 +168,20 @@
         <span class="tag">Postman</span>
       </div>
 
+      <div class="line">
+        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">ls links/</span>
+      </div>
+      <div class="links">
+        <a href="https://github.com/szogoon" target="_blank" rel="noopener noreferrer">github.com/szogoon</a>
+        <a href="https://www.linkedin.com/in/przemyslaw-malolepszy-68050513a/" target="_blank" rel="noopener noreferrer">linkedin</a>
+        <a href="mailto:szogoon@gmail.com">szogoon@gmail.com</a>
+      </div>
+
       <hr class="divider">
-      <!-- links goes here -->
+
+      <div class="line">
+        <span class="prompt">visitor@web</span><span class="cmd">:~$</span><span class="cursor"></span>
+      </div>
     </div>
   </div>
 </body>
