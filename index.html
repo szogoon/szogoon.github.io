@@ -71,6 +71,10 @@
     /* whoami output */
     .name  { color: #58a6ff; font-size: 22px; font-weight: bold; display: block; margin: 2px 0; }
     .title { color: #8b949e; display: block; }
+
+    /* about output */
+    .bio { color: #c9d1d9; display: block; margin: 2px 0; }
+    .bio-gap { margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -91,7 +95,19 @@
       <span class="title">Full Stack Software Engineer</span>
 
       <hr class="divider">
-      <!-- about goes here -->
+      <div class="line">
+        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">cat about.txt</span>
+      </div>
+      <span class="bio">Started out as a sysadmin — Windows &amp; Linux servers,</span>
+      <span class="bio">Active Directory, Exchange, Postfix, MySQL.</span>
+      <span class="bio">Grew into software engineering from the ground up.</span>
+      <span class="bio bio-gap">Today I build full stack applications in Go and Azure,</span>
+      <span class="bio">with AI integrated into my day-to-day workflow.</span>
+      <span class="bio">I don't just write code — I set up services, maintain</span>
+      <span class="bio">them, and know what happens when they break.</span>
+
+      <hr class="divider">
+      <!-- skills goes here -->
     </div>
   </div>
 </body>
