@@ -48,6 +48,16 @@
     .dot-yellow { background: #ffbd2e; }
     .dot-green  { background: #27c93f; }
 
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(255, 95, 86, 0.7); transform: scale(1); }
+      50% { box-shadow: 0 0 10px 4px rgba(255, 95, 86, 0.5); transform: scale(1.2); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 95, 86, 0); transform: scale(1); }
+    }
+
+    .dot-highlight {
+      animation: pulse-red 1s ease-in-out;
+    }
+
     /* Game Modal */
     .modal {
       display: none;
@@ -628,6 +638,14 @@
         }
       }
     };
+
+    // Periodic Highlight
+    setInterval(() => {
+      trigger.classList.add('dot-highlight');
+      setTimeout(() => {
+        trigger.classList.remove('dot-highlight');
+      }, 1000);
+    }, 10000); // 10 seconds
   </script>
 </body>
 </html>
