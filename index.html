@@ -93,6 +93,7 @@
       color: #c9d1d9;
       max-width: 95vw;
       max-height: 95vh;
+      overflow-y: auto;
     }
 
     .close-button {
@@ -119,6 +120,20 @@
       margin-top: 10px;
       font-size: 14px;
       color: #8b949e;
+    }
+
+    #mobile-controls {
+      display: none;
+      margin-top: 15px;
+      user-select: none;
+    }
+
+    .mobile-ui #mobile-controls {
+      display: block !important;
+    }
+
+    .mobile-ui #game-instructions {
+      display: none !important;
     }
 
     .titlebar-label {
@@ -218,6 +233,11 @@
       50%       { opacity: 0; }
     }
 
+    @media (max-width: 800px) {
+      #mobile-controls { display: block; }
+      #game-instructions { display: none; }
+    }
+
     @media (max-width: 600px) {
       body { padding: 12px; align-items: flex-start; padding-top: 24px; }
       .terminal { max-height: calc(100% - 36px); }
@@ -227,7 +247,7 @@
     }
   </style>
 </head>
-<body>
+<body class="initial-load">
   <div class="terminal">
     <div class="titlebar">
       <div id="game-trigger" class="dot dot-red"></div>
@@ -309,6 +329,16 @@
       <div id="game-instructions">
         Arrows to Rotate & Thrust | Space to Fire
       </div>
+      <div id="mobile-controls">
+        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 10px;">
+          <button id="btn-thrust" style="width: 60px; height: 60px; border-radius: 50%; background: #30363d; color: white; border: 1px solid #8b949e; outline: none; touch-action: manipulation;">▲</button>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 15px; align-items: center;">
+          <button id="btn-left" style="width: 60px; height: 60px; border-radius: 50%; background: #30363d; color: white; border: 1px solid #8b949e; outline: none; touch-action: manipulation;">◀</button>
+          <button id="btn-fire" style="width: 70px; height: 70px; border-radius: 50%; background: #ff5f56; color: white; border: 2px solid white; outline: none; font-weight: bold; touch-action: manipulation;">FIRE</button>
+          <button id="btn-right" style="width: 60px; height: 60px; border-radius: 50%; background: #30363d; color: white; border: 1px solid #8b949e; outline: none; touch-action: manipulation;">▶</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -371,7 +401,7 @@
         return null;
       },
       'help': function() {
-        return '<div class="line">Available commands: whoami, ls, cat, clear, game, help, ?</div>';
+        return '<div class="line">Available commands: whoami, ls, cat, clear, game, help, ?, mobile</div>';
       },
       '?': function() {
         return this.help();
@@ -379,6 +409,10 @@
       'game': function() {
         openAsteroidsGame();
         return '<div class="line">Launching terminal game... (Use arrow keys to move, Space to fire)</div>';
+      },
+      'mobile': function() {
+        document.body.classList.toggle('mobile-ui');
+        return '<div class="line">Mobile UI ' + (document.body.classList.contains('mobile-ui') ? 'enabled' : 'disabled') + '</div>';
       }
     };
 
@@ -759,6 +793,31 @@
         g_trigger.classList.remove('dot-highlight');
       }, 1000);
     }, 10000);
+
+    // Mobile Detection & Touch Controls
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   (navigator.maxTouchPoints > 0) || 
+                   (window.innerWidth <= 800);
+
+    if (isMobile) {
+      document.body.classList.add('mobile-ui');
+    }
+
+    var btnThrust = document.getElementById('btn-thrust');
+    var btnLeft = document.getElementById('btn-left');
+    var btnRight = document.getElementById('btn-right');
+    var btnFire = document.getElementById('btn-fire');
+
+    btnThrust.addEventListener('touchstart', function(e) { e.preventDefault(); if (ship) ship.thrusting = true; });
+    btnThrust.addEventListener('touchend', function(e) { e.preventDefault(); if (ship) ship.thrusting = false; });
+    
+    btnLeft.addEventListener('touchstart', function(e) { e.preventDefault(); if (ship) ship.rot = TURN_SPEED / 180 * Math.PI / FPS; });
+    btnLeft.addEventListener('touchend', function(e) { e.preventDefault(); if (ship) ship.rot = 0; });
+    
+    btnRight.addEventListener('touchstart', function(e) { e.preventDefault(); if (ship) ship.rot = -TURN_SPEED / 180 * Math.PI / FPS; });
+    btnRight.addEventListener('touchend', function(e) { e.preventDefault(); if (ship) ship.rot = 0; });
+    
+    btnFire.addEventListener('touchstart', function(e) { e.preventDefault(); shootBullet(); });
   </script>
 </body>
 </html>
