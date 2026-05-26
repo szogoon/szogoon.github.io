@@ -295,7 +295,7 @@
       <div id="game-over" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(13, 17, 23, 0.9); padding: 20px; border: 2px solid #ff5f56; border-radius: 10px; z-index: 10;">
         <h3 style="color: #ff5f56; margin-bottom: 10px;">GAME OVER</h3>
         <p id="final-score" style="color: #c9d1d9; margin-bottom: 20px;"></p>
-        <button id="restart-game" style="background: #3fb950; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-family: inherit;">Restart</button>
+        <button id="restart-game" style="background: #238636; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-family: inherit;">Restart</button>
       </div>
       <canvas id="asteroids-canvas" width="700" height="500"></canvas>
       <div id="game-instructions">
@@ -378,7 +378,7 @@
       var trimmedInput = input.trim();
       if (!trimmedInput) return '';
 
-      var parts = trimmedInput.split(/[ ]+/);
+      var parts = trimmedInput.split(/ +/);
       var cmd = parts[0].toLowerCase();
       var args = parts.slice(1);
 
@@ -677,9 +677,9 @@
       else if (r > ASTEROID_SIZE / 8) updateScore(50);
       else updateScore(100);
       if (r > ASTEROID_SIZE / 8) {
-        asteroids.push(new Asteroid(x, y, Math.ceil(r / 2)));
-        asteroids.push(new Asteroid(x, y, Math.ceil(r / 2)));
+        asteroids.push(new Asteroid(x, y, Math.ceil(r / 2)), new Asteroid(x, y, Math.ceil(r / 2)));
       }
+
       asteroids.splice(index, 1);
     }
 
@@ -703,7 +703,8 @@
       terminalInput.focus();
     };
 
-    window.onclick = function(event) {
+    globalThis.onclick = function(event) {
+
       if (event.target == g_modal) {
         g_modal.style.display = "none";
         gameOver = true;
