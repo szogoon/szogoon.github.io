@@ -13,17 +13,21 @@
 
     body {
       background: #0d1117;
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
       font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
     }
 
     .terminal {
       width: 100%;
       max-width: 800px;
+      max-height: calc(100vh - 48px);
+      display: flex;
+      flex-direction: column;
       border: 1px solid #30363d;
       border-radius: 10px;
       overflow: hidden;
@@ -184,7 +188,11 @@
     #terminal-input {
       position: absolute;
       opacity: 0;
-      left: -9999px;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
     }
 
     /* blinking cursor */
@@ -204,6 +212,7 @@
 
     @media (max-width: 600px) {
       body { padding: 12px; align-items: flex-start; padding-top: 24px; }
+      .terminal { max-height: calc(100% - 36px); }
       .body { padding: 20px 18px; font-size: 13px; }
       .name { font-size: 18px; }
       .links { gap: 14px; }
