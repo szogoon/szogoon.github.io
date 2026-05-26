@@ -81,8 +81,8 @@
       border-radius: 10px;
       text-align: center;
       color: #c9d1d9;
-      max-width: 90vw;
-      max-height: 90vh;
+      max-width: 95vw;
+      max-height: 95vh;
     }
 
     .close-button {
@@ -119,9 +119,23 @@
 
     .body {
       background: #0d1117;
+      color: #c9d1d9;
       padding: 28px 32px;
       font-size: 15px;
       line-height: 1.7;
+      max-height: 85vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #30363d transparent;
+    }
+
+    .body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .body::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border-radius: 4px;
     }
 
     /* shared content styles */
@@ -129,7 +143,7 @@
     .prompt   { color: #3fb950; }
     .cmd      { color: #c9d1d9; }
     .divider  { border: none; border-top: 1px solid #21262d; margin: 16px 0; }
-    .line     { margin: 10px 0; }
+    .line     { margin: 10px 0; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 
     /* whoami output */
     .name  { color: #58a6ff; font-size: 22px; font-weight: bold; display: block; margin: 2px 0; }
@@ -140,7 +154,7 @@
     .bio-gap { margin-top: 8px; }
 
     /* skills tags */
-    .tags { margin: 4px 0; }
+    .tags { margin: 4px 0; display: flex; flex-wrap: wrap; gap: 5px; }
 
     .tag {
       display: inline-block;
@@ -150,7 +164,6 @@
       font-size: 12px;
       padding: 1px 8px;
       border-radius: 4px;
-      margin: 2px 3px 2px 0;
     }
 
     .tag-primary {
@@ -168,14 +181,19 @@
 
     .links a:hover { color: #58a6ff; }
 
+    #terminal-input {
+      position: absolute;
+      opacity: 0;
+      left: -9999px;
+    }
+
     /* blinking cursor */
     .cursor {
       display: inline-block;
       width: 9px;
       height: 16px;
       background: #58a6ff;
-      vertical-align: text-bottom;
-      margin-left: 2px;
+      margin: auto 0;
       animation: blink 1s step-end infinite;
     }
 
@@ -198,60 +216,63 @@
       <div id="game-trigger" class="dot dot-red"></div>
       <div class="dot dot-yellow"></div>
       <div class="dot dot-green"></div>
-      <span class="titlebar-label">~  —  bash</span>
+      <span class="titlebar-label">visitor@web: ~</span>
     </div>
-    <div class="body">
-      <div class="line"><span class="comment"># welcome to my corner of the internet</span></div>
+    <div class="body" id="terminal-body">
+      <div id="terminal-history">
+        <div class="line"><span class="comment"># welcome to my corner of the internet</span></div>
+
+        <div class="line">
+          <span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd">whoami</span>
+        </div>
+        <span class="name">Przemysław Małolepszy</span>
+        <span class="title">Full Stack Software Engineer</span>
+
+        <hr class="divider">
+        <div class="line">
+          <span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd">cat about.txt</span>
+        </div>
+        <span class="bio">Started out as a sysadmin — Windows &amp; Linux servers,</span>
+        <span class="bio">Active Directory, Exchange, Postfix, MySQL.</span>
+        <span class="bio">Grew into software engineering from the ground up.</span>
+        <span class="bio bio-gap">Today I build full stack applications in Go and Azure,</span>
+        <span class="bio">with AI integrated into my day-to-day workflow.</span>
+        <span class="bio">I don't just write code — I set up services, maintain</span>
+        <span class="bio">them, and know what happens when they break.</span>
+
+        <hr class="divider">
+        <div class="line">
+          <span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd">cat skills.txt</span>
+        </div>
+        <div class="tags">
+          <span class="tag tag-primary">Go</span>
+          <span class="tag tag-primary">TypeScript</span>
+          <span class="tag tag-primary">Azure</span>
+          <span class="tag">Linux</span>
+          <span class="tag">Windows Server</span>
+          <span class="tag">Active Directory</span>
+          <span class="tag">MySQL</span>
+          <span class="tag">Postfix</span>
+          <span class="tag">Exchange</span>
+          <span class="tag">Postman</span>
+        </div>
+
+        <div class="line">
+          <span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd">ls links/</span>
+        </div>
+        <div class="links">
+          <a href="https://github.com/szogoon" target="_blank" rel="noopener noreferrer">github.com/szogoon</a>
+          <a href="https://www.linkedin.com/in/przemyslaw-malolepszy-68050513a/" target="_blank" rel="noopener noreferrer">linkedin</a>
+          <a href="https://stackoverflow.com/users/8119084/szogoon" target="_blank" rel="noopener noreferrer">stackoverflow</a>
+          <a href="mailto:szogoon@gmail.com">szogoon@gmail.com</a>
+        </div>
+
+        <hr class="divider">
+      </div>
 
       <div class="line">
-        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">whoami</span>
-      </div>
-      <span class="name">Przemysław Małolepszy</span>
-      <span class="title">Full Stack Software Engineer</span>
-
-      <hr class="divider">
-      <div class="line">
-        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">cat about.txt</span>
-      </div>
-      <span class="bio">Started out as a sysadmin — Windows &amp; Linux servers,</span>
-      <span class="bio">Active Directory, Exchange, Postfix, MySQL.</span>
-      <span class="bio">Grew into software engineering from the ground up.</span>
-      <span class="bio bio-gap">Today I build full stack applications in Go and Azure,</span>
-      <span class="bio">with AI integrated into my day-to-day workflow.</span>
-      <span class="bio">I don't just write code — I set up services, maintain</span>
-      <span class="bio">them, and know what happens when they break.</span>
-
-      <hr class="divider">
-      <div class="line">
-        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">cat skills.txt</span>
-      </div>
-      <div class="tags">
-        <span class="tag tag-primary">Go</span>
-        <span class="tag tag-primary">TypeScript</span>
-        <span class="tag tag-primary">Azure</span>
-        <span class="tag">Linux</span>
-        <span class="tag">Windows Server</span>
-        <span class="tag">Active Directory</span>
-        <span class="tag">MySQL</span>
-        <span class="tag">Postfix</span>
-        <span class="tag">Exchange</span>
-        <span class="tag">Postman</span>
-      </div>
-
-      <div class="line">
-        <span class="prompt">visitor@web</span><span class="cmd">:~$</span>&nbsp;<span class="cmd">ls links/</span>
-      </div>
-      <div class="links">
-        <a href="https://github.com/szogoon" target="_blank" rel="noopener noreferrer">github.com/szogoon</a>
-        <a href="https://www.linkedin.com/in/przemyslaw-malolepszy-68050513a/" target="_blank" rel="noopener noreferrer">linkedin</a>
-        <a href="https://stackoverflow.com/users/8119084/szogoon" target="_blank" rel="noopener noreferrer">stackoverflow</a>
-        <a href="mailto:szogoon@gmail.com">szogoon@gmail.com</a>
-      </div>
-
-      <hr class="divider">
-
-      <div class="line">
-        <span class="prompt">visitor@web</span><span class="cmd">:~$</span><span class="cursor"></span>
+        <span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd" id="input-display"></span><span class="cursor"></span>
+        <input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false">
       </div>
     </div>
   </div>
@@ -275,27 +296,165 @@
   </div>
 
   <script>
-    const canvas = document.getElementById('asteroids-canvas');
-    const ctx = canvas.getContext('2d');
-    const modal = document.getElementById('game-modal');
-    const trigger = document.getElementById('game-trigger');
-    const closeBtn = document.getElementById('close-game');
+    var terminalBody = document.getElementById('terminal-body');
+    var terminalHistory = document.getElementById('terminal-history');
+    var terminalInput = document.getElementById('terminal-input');
+    var inputDisplay = document.getElementById('input-display');
 
-    // Constants
+    var commands = {
+      'whoami': function() {
+        return '<span class="name">Przemysław Małolepszy</span>' +
+               '<span class="title">Full Stack Software Engineer</span>';
+      },
+      'ls': function(args) {
+        var path = args[0] || '';
+        if (path === 'links' || path === 'links/') {
+          return '<div class="links">' +
+                 '<a href="https://github.com/szogoon" target="_blank" rel="noopener noreferrer">github.com/szogoon</a>' +
+                 '<a href="https://www.linkedin.com/in/przemyslaw-malolepszy-68050513a/" target="_blank" rel="noopener noreferrer">linkedin</a>' +
+                 '<a href="https://stackoverflow.com/users/8119084/szogoon" target="_blank" rel="noopener noreferrer">stackoverflow</a>' +
+                 '<a href="mailto:szogoon@gmail.com">szogoon@gmail.com</a>' +
+                 '</div>';
+        }
+        return '<div class="line">about.txt  skills.txt  links/</div>';
+      },
+      'cat': function(args) {
+        var file = args[0];
+        if (file === 'about.txt') {
+          return '<span class="bio">Started out as a sysadmin — Windows &amp; Linux servers,</span>' +
+                 '<span class="bio">Active Directory, Exchange, Postfix, MySQL.</span>' +
+                 '<span class="bio">Grew into software engineering from the ground up.</span>' +
+                 '<span class="bio bio-gap">Today I build full stack applications in Go and Azure,</span>' +
+                 '<span class="bio">with AI integrated into my day-to-day workflow.</span>' +
+                 '<span class="bio">I don\'t just write code — I set up services, maintain</span>' +
+                 '<span class="bio">them, and know what happens when they break.</span>';
+        }
+        if (file === 'skills.txt') {
+          return '<div class="tags">' +
+                 '<span class="tag tag-primary">Go</span>' +
+                 '<span class="tag tag-primary">TypeScript</span>' +
+                 '<span class="tag tag-primary">Azure</span>' +
+                 '<span class="tag">Linux</span>' +
+                 '<span class="tag">Windows Server</span>' +
+                 '<span class="tag">Active Directory</span>' +
+                 '<span class="tag">MySQL</span>' +
+                 '<span class="tag">Postfix</span>' +
+                 '<span class="tag">Exchange</span>' +
+                 '<span class="tag">Postman</span>' +
+                 '</div>';
+        }
+        if (file === 'links' || file === 'links/') {
+          return '<div class="line">cat: links/: Is a directory</div>';
+        }
+        if (!file) return '';
+        return '<div class="line">cat: ' + file + ': No such file or directory</div>';
+      },
+      'clear': function() {
+        terminalHistory.innerHTML = '';
+        return null;
+      },
+      'help': function() {
+        return '<div class="line">Available commands: whoami, ls, cat, clear, game, help, ?</div>';
+      },
+      '?': function() {
+        return this.help();
+      },
+      'game': function() {
+        openAsteroidsGame();
+        return '<div class="line">Launching terminal game... (Use arrow keys to move, Space to fire)</div>';
+      }
+    };
+
+    function handleCommand(input) {
+      var trimmedInput = input.trim();
+      if (!trimmedInput) return '';
+
+      var parts = trimmedInput.split(/[ ]+/);
+      var cmd = parts[0].toLowerCase();
+      var args = parts.slice(1);
+
+      if (commands[cmd]) {
+        return commands[cmd](args);
+      } else {
+        return '<div class="line">bash: ' + cmd + ': command not found</div>';
+      }
+    }
+
+    terminalInput.addEventListener('input', function() {
+      inputDisplay.textContent = terminalInput.value;
+    });
+
+    terminalInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        var input = terminalInput.value;
+        var output = handleCommand(input);
+
+        var commandLine = document.createElement('div');
+        commandLine.className = 'line';
+        commandLine.innerHTML = '<span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd">' + input + '</span>';
+        terminalHistory.appendChild(commandLine);
+
+        if (output !== null) {
+          var outputContainer = document.createElement('div');
+          outputContainer.innerHTML = output;
+          terminalHistory.appendChild(outputContainer);
+          
+          if (output !== '') {
+            var hr = document.createElement('hr');
+            hr.className = 'divider';
+            terminalHistory.appendChild(hr);
+          }
+        }
+
+        terminalInput.value = '';
+        inputDisplay.textContent = '';
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+      }
+    });
+
+    ['click', 'touchstart'].forEach(function(event) {
+      document.addEventListener(event, function() {
+        if (!g_modal.style.display || g_modal.style.display === "none") {
+          terminalInput.focus();
+        }
+      });
+    });
+
+    terminalInput.focus();
+
+    console.log(
+      "%c" +
+      "  _    _      _ _         _                _             \n" +
+      " | |  | |    | | |       | |              | |            \n" +
+      " | |__| | ___| | | ___   | |__   __ _  ___| | _____ _ __ \n" +
+      " |  __  |/ _ \\ | |/ _ \\  | '_ \\ / _` |/ __| |/ / _ \\ '__|\n" +
+      " | |  | |  __/ | | (_) | | | | | (_| | (__|   <  __/ |   \n" +
+      " |_|  |_|\\___|_|_|\\___/  |_| |_|\\__,_|\\___|_|\\_\\___|_|   \n" +
+      "\n" +
+      "                    pls don't hurt me... (v_v)",
+      "color: #58a6ff; font-weight: bold; font-family: monospace;"
+    );
+
+    // Asteroids Game Logic
+    const g_canvas = document.getElementById('asteroids-canvas');
+    const g_ctx = g_canvas.getContext('2d');
+    const g_modal = document.getElementById('game-modal');
+    const g_trigger = document.getElementById('game-trigger');
+    const g_closeBtn = document.getElementById('close-game');
+
     const FPS = 60;
-    const FRICTION = 0.7; // friction coefficient (0 = no friction, 1 = lots)
-    const SHIP_SIZE = 20; // height in pixels
-    const TURN_SPEED = 360; // degrees per second
-    const SHIP_THRUST = 5; // acceleration in pixels per second
-    const ASTEROID_NUM = 5; // starting number
-    const ASTEROID_SIZE = 100; // starting size in pixels
-    const ASTEROID_SPD = 50; // max starting speed in pixels per second
-    const ASTEROID_VERT = 10; // average number of vertices on each asteroid
-    const ASTEROID_JAG = 0.4; // jaggedness (0 = none, 1 = lots)
-    const SHOW_CENTRE_DOT = false; // show or hide ship's centre dot
-    const BULLET_MAX = 10; // max bullets on screen at once
-    const BULLET_SPD = 500; // speed in pixels per second
-    const BULLET_DIST = 0.6; // max distance bullet can travel as fraction of screen width
+    const FRICTION = 0.7;
+    const SHIP_SIZE = 20;
+    const TURN_SPEED = 360;
+    const SHIP_THRUST = 5;
+    const ASTEROID_NUM = 5;
+    const ASTEROID_SIZE = 100;
+    const ASTEROID_SPD = 50;
+    const ASTEROID_VERT = 10;
+    const ASTEROID_JAG = 0.4;
+    const BULLET_MAX = 10;
+    const BULLET_SPD = 500;
+    const BULLET_DIST = 0.6;
 
     let ship, asteroids, bullets, gameLoop, score, gameOver;
 
@@ -312,72 +471,51 @@
       document.getElementById('game-over').style.display = 'none';
       updateScore(0);
       createAsteroidBelt();
-      update(); // Start the loop
+      update();
     }
 
     function updateScore(points) {
       score += points;
-      document.getElementById('game-score').innerText = `Score: ${score}`;
+      document.getElementById('game-score').innerText = 'Score: ' + score;
     }
 
     class Ship {
       constructor() {
-        this.x = canvas.width / 2;
-        this.y = canvas.height / 2;
+        this.x = g_canvas.width / 2;
+        this.y = g_canvas.height / 2;
         this.r = SHIP_SIZE / 2;
-        this.a = 90 / 180 * Math.PI; // convert to radians
+        this.a = 90 / 180 * Math.PI;
         this.rot = 0;
         this.thrusting = false;
         this.thrust = { x: 0, y: 0 };
       }
 
       draw() {
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = SHIP_SIZE / 20;
-        ctx.beginPath();
-        ctx.moveTo( // nose
-          this.x + 4 / 3 * this.r * Math.cos(this.a),
-          this.y - 4 / 3 * this.r * Math.sin(this.a)
-        );
-        ctx.lineTo( // rear left
-          this.x - this.r * (2 / 3 * Math.cos(this.a) + Math.sin(this.a)),
-          this.y + this.r * (2 / 3 * Math.sin(this.a) - Math.cos(this.a))
-        );
-        ctx.lineTo( // rear right
-          this.x - this.r * (2 / 3 * Math.cos(this.a) - Math.sin(this.a)),
-          this.y + this.r * (2 / 3 * Math.sin(this.a) + Math.cos(this.a))
-        );
-        ctx.closePath();
-        ctx.stroke();
+        g_ctx.strokeStyle = "white";
+        g_ctx.lineWidth = SHIP_SIZE / 20;
+        g_ctx.beginPath();
+        g_ctx.moveTo(this.x + 4 / 3 * this.r * Math.cos(this.a), this.y - 4 / 3 * this.r * Math.sin(this.a));
+        g_ctx.lineTo(this.x - this.r * (2 / 3 * Math.cos(this.a) + Math.sin(this.a)), this.y + this.r * (2 / 3 * Math.sin(this.a) - Math.cos(this.a)));
+        g_ctx.lineTo(this.x - this.r * (2 / 3 * Math.cos(this.a) - Math.sin(this.a)), this.y + this.r * (2 / 3 * Math.sin(this.a) + Math.cos(this.a)));
+        g_ctx.closePath();
+        g_ctx.stroke();
 
         if (this.thrusting) {
-          ctx.fillStyle = "red";
-          ctx.strokeStyle = "yellow";
-          ctx.lineWidth = SHIP_SIZE / 10;
-          ctx.beginPath();
-          ctx.moveTo( // rear left
-            this.x - this.r * (2 / 3 * Math.cos(this.a) + 0.5 * Math.sin(this.a)),
-            this.y + this.r * (2 / 3 * Math.sin(this.a) - 0.5 * Math.cos(this.a))
-          );
-          ctx.lineTo( // rear centre (behind)
-            this.x - this.r * 6 / 3 * Math.cos(this.a),
-            this.y + this.r * 6 / 3 * Math.sin(this.a)
-          );
-          ctx.lineTo( // rear right
-            this.x - this.r * (2 / 3 * Math.cos(this.a) - 0.5 * Math.sin(this.a)),
-            this.y + this.r * (2 / 3 * Math.sin(this.a) + 0.5 * Math.cos(this.a))
-          );
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
+          g_ctx.fillStyle = "red";
+          g_ctx.strokeStyle = "yellow";
+          g_ctx.lineWidth = SHIP_SIZE / 10;
+          g_ctx.beginPath();
+          g_ctx.moveTo(this.x - this.r * (2 / 3 * Math.cos(this.a) + 0.5 * Math.sin(this.a)), this.y + this.r * (2 / 3 * Math.sin(this.a) - 0.5 * Math.cos(this.a)));
+          g_ctx.lineTo(this.x - this.r * 6 / 3 * Math.cos(this.a), this.y + this.r * 6 / 3 * Math.sin(this.a));
+          g_ctx.lineTo(this.x - this.r * (2 / 3 * Math.cos(this.a) - 0.5 * Math.sin(this.a)), this.y + this.r * (2 / 3 * Math.sin(this.a) + 0.5 * Math.cos(this.a)));
+          g_ctx.closePath();
+          g_ctx.fill();
+          g_ctx.stroke();
         }
       }
 
       update() {
-        // rotation
         this.a += this.rot;
-
-        // thrusting
         if (this.thrusting) {
           this.thrust.x += SHIP_THRUST * Math.cos(this.a) / FPS;
           this.thrust.y -= SHIP_THRUST * Math.sin(this.a) / FPS;
@@ -385,16 +523,12 @@
           this.thrust.x -= FRICTION * this.thrust.x / FPS;
           this.thrust.y -= FRICTION * this.thrust.y / FPS;
         }
-
-        // movement
         this.x += this.thrust.x;
         this.y += this.thrust.y;
-
-        // screen edge wrapping
-        if (this.x < 0 - this.r) this.x = canvas.width + this.r;
-        else if (this.x > canvas.width + this.r) this.x = 0 - this.r;
-        if (this.y < 0 - this.r) this.y = canvas.height + this.r;
-        else if (this.y > canvas.height + this.r) this.y = 0 - this.r;
+        if (this.x < 0 - this.r) this.x = g_canvas.width + this.r;
+        else if (this.x > g_canvas.width + this.r) this.x = 0 - this.r;
+        if (this.y < 0 - this.r) this.y = g_canvas.height + this.r;
+        else if (this.y > g_canvas.height + this.r) this.y = 0 - this.r;
       }
     }
 
@@ -414,32 +548,24 @@
       }
 
       draw() {
-        ctx.strokeStyle = "slategrey";
-        ctx.lineWidth = SHIP_SIZE / 20;
-        ctx.beginPath();
-        ctx.moveTo(
-          this.x + this.r * this.offsets[0] * Math.cos(this.a),
-          this.y + this.r * this.offsets[0] * Math.sin(this.a)
-        );
+        g_ctx.strokeStyle = "slategrey";
+        g_ctx.lineWidth = SHIP_SIZE / 20;
+        g_ctx.beginPath();
+        g_ctx.moveTo(this.x + this.r * this.offsets[0] * Math.cos(this.a), this.y + this.r * this.offsets[0] * Math.sin(this.a));
         for (let i = 1; i < this.vert; i++) {
-          ctx.lineTo(
-            this.x + this.r * this.offsets[i] * Math.cos(this.a + i * Math.PI * 2 / this.vert),
-            this.y + this.r * this.offsets[i] * Math.sin(this.a + i * Math.PI * 2 / this.vert)
-          );
+          g_ctx.lineTo(this.x + this.r * this.offsets[i] * Math.cos(this.a + i * Math.PI * 2 / this.vert), this.y + this.r * this.offsets[i] * Math.sin(this.a + i * Math.PI * 2 / this.vert));
         }
-        ctx.closePath();
-        ctx.stroke();
+        g_ctx.closePath();
+        g_ctx.stroke();
       }
 
       update() {
         this.x += this.xv;
         this.y += this.yv;
-
-        // wrapping
-        if (this.x < 0 - this.r) this.x = canvas.width + this.r;
-        else if (this.x > canvas.width + this.r) this.x = 0 - this.r;
-        if (this.y < 0 - this.r) this.y = canvas.height + this.r;
-        else if (this.y > canvas.height + this.r) this.y = 0 - this.r;
+        if (this.x < 0 - this.r) this.x = g_canvas.width + this.r;
+        else if (this.x > g_canvas.width + this.r) this.x = 0 - this.r;
+        if (this.y < 0 - this.r) this.y = g_canvas.height + this.r;
+        else if (this.y > g_canvas.height + this.r) this.y = 0 - this.r;
       }
     }
 
@@ -453,22 +579,20 @@
       }
 
       draw() {
-        ctx.fillStyle = "salmon";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, SHIP_SIZE / 15, 0, Math.PI * 2, false);
-        ctx.fill();
+        g_ctx.fillStyle = "salmon";
+        g_ctx.beginPath();
+        g_ctx.arc(this.x, this.y, SHIP_SIZE / 15, 0, Math.PI * 2, false);
+        g_ctx.fill();
       }
 
       update() {
         this.x += this.xv;
         this.y += this.yv;
         this.dist += Math.sqrt(Math.pow(this.xv, 2) + Math.pow(this.yv, 2));
-
-        // wrapping
-        if (this.x < 0) this.x = canvas.width;
-        else if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        else if (this.y > canvas.height) this.y = 0;
+        if (this.x < 0) this.x = g_canvas.width;
+        else if (this.x > g_canvas.width) this.x = 0;
+        if (this.y < 0) this.y = g_canvas.height;
+        else if (this.y > g_canvas.height) this.y = 0;
       }
     }
 
@@ -477,8 +601,8 @@
       let x, y;
       for (let i = 0; i < ASTEROID_NUM; i++) {
         do {
-          x = Math.floor(Math.random() * canvas.width);
-          y = Math.floor(Math.random() * canvas.height);
+          x = Math.floor(Math.random() * g_canvas.width);
+          y = Math.floor(Math.random() * g_canvas.height);
         } while (distBetweenPoints(ship.x, ship.y, x, y) < ASTEROID_SIZE * 2 + ship.r);
         asteroids.push(new Asteroid(x, y, Math.ceil(ASTEROID_SIZE / 2)));
       }
@@ -490,88 +614,59 @@
 
     function shootBullet() {
       if (bullets.length < BULLET_MAX) {
-        bullets.push(new Bullet(
-          ship.x + 4 / 3 * ship.r * Math.cos(ship.a),
-          ship.y - 4 / 3 * ship.r * Math.sin(ship.a),
-          ship.a
-        ));
+        bullets.push(new Bullet(ship.x + 4 / 3 * ship.r * Math.cos(ship.a), ship.y - 4 / 3 * ship.r * Math.sin(ship.a), ship.a));
       }
     }
 
     function update() {
       if (gameOver) return;
-
-      // Draw Space
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Ship
+      g_ctx.fillStyle = "black";
+      g_ctx.fillRect(0, 0, g_canvas.width, g_canvas.height);
       ship.update();
       ship.draw();
-
-      // Bullets
       for (let i = bullets.length - 1; i >= 0; i--) {
         bullets[i].update();
         bullets[i].draw();
-
-        // check distance
-        if (bullets[i].dist > BULLET_DIST * canvas.width) {
+        if (bullets[i].dist > BULLET_DIST * g_canvas.width) {
           bullets.splice(i, 1);
           continue;
         }
-
-        // check collision with asteroids
         for (let j = asteroids.length - 1; j >= 0; j--) {
           if (distBetweenPoints(bullets[i].x, bullets[i].y, asteroids[j].x, asteroids[j].y) < asteroids[j].r) {
-            // hit!
             bullets.splice(i, 1);
             splitAsteroid(j);
             break;
           }
         }
       }
-
-      // Asteroids
       for (let i = asteroids.length - 1; i >= 0; i--) {
         asteroids[i].update();
         asteroids[i].draw();
-
-        // check collision with ship
         if (distBetweenPoints(ship.x, ship.y, asteroids[i].x, asteroids[i].y) < ship.r + asteroids[i].r) {
           handleGameOver();
         }
       }
-
-      if (asteroids.length === 0) {
-          createAsteroidBelt();
-      }
-
+      if (asteroids.length === 0) createAsteroidBelt();
       gameLoop = requestAnimationFrame(update);
     }
 
     function handleGameOver() {
       gameOver = true;
       document.getElementById('game-over').style.display = 'block';
-      document.getElementById('final-score').innerText = `Your final score: ${score}`;
+      document.getElementById('final-score').innerText = 'Your final score: ' + score;
       if (gameLoop) {
         cancelAnimationFrame(gameLoop);
         gameLoop = null;
       }
     }
 
-    document.getElementById('restart-game').onclick = initGame;
-    document.getElementById('restart-game').onmousedown = (e) => e.stopPropagation(); // prevent modal close
-
     function splitAsteroid(index) {
       let x = asteroids[index].x;
       let y = asteroids[index].y;
       let r = asteroids[index].r;
-
-      // add score
-      if (r > ASTEROID_SIZE / 4) updateScore(20); // large
-      else if (r > ASTEROID_SIZE / 8) updateScore(50); // medium
-      else updateScore(100); // small
-
+      if (r > ASTEROID_SIZE / 4) updateScore(20);
+      else if (r > ASTEROID_SIZE / 8) updateScore(50);
+      else updateScore(100);
       if (r > ASTEROID_SIZE / 8) {
         asteroids.push(new Asteroid(x, y, Math.ceil(r / 2)));
         asteroids.push(new Asteroid(x, y, Math.ceil(r / 2)));
@@ -579,73 +674,63 @@
       asteroids.splice(index, 1);
     }
 
-    // Input handling
-    document.addEventListener("keydown", (ev) => {
-      if (!modal.style.display || modal.style.display === "none") return;
-      switch(ev.keyCode) {
-        case 32: // space (shoot)
-          shootBullet();
-          break;
-        case 37: // left arrow (rotate left)
-          ship.rot = TURN_SPEED / 180 * Math.PI / FPS;
-          break;
-        case 38: // up arrow (thrust forward)
-          ship.thrusting = true;
-          break;
-        case 39: // right arrow (rotate right)
-          ship.rot = -TURN_SPEED / 180 * Math.PI / FPS;
-          break;
-      }
-    });
+    document.getElementById('restart-game').onclick = initGame;
+    document.getElementById('restart-game').onmousedown = function(e) { e.stopPropagation(); };
 
-    document.addEventListener("keyup", (ev) => {
-      if (!modal.style.display || modal.style.display === "none") return;
-      switch(ev.keyCode) {
-        case 37: // left arrow (stop rotating)
-          ship.rot = 0;
-          break;
-        case 38: // up arrow (stop thrusting)
-          ship.thrusting = false;
-          break;
-        case 39: // right arrow (stop rotating)
-          ship.rot = 0;
-          break;
-      }
-    });
-
-    // Modal Control
-    trigger.onclick = () => {
-      modal.style.display = "flex";
+    function openAsteroidsGame() {
+      g_modal.style.display = "flex";
+      terminalInput.blur();
       initGame();
-    };
+    }
 
-    closeBtn.onclick = () => {
-      modal.style.display = "none";
+    g_trigger.onclick = openAsteroidsGame;
+    g_closeBtn.onclick = function() {
+      g_modal.style.display = "none";
       gameOver = true;
       if (gameLoop) {
         cancelAnimationFrame(gameLoop);
         gameLoop = null;
       }
+      terminalInput.focus();
     };
 
-    window.onclick = (event) => {
-      if (event.target == modal) {
-        modal.style.display = "none";
+    window.onclick = function(event) {
+      if (event.target == g_modal) {
+        g_modal.style.display = "none";
         gameOver = true;
         if (gameLoop) {
           cancelAnimationFrame(gameLoop);
           gameLoop = null;
         }
+        terminalInput.focus();
       }
     };
 
-    // Periodic Highlight
-    setInterval(() => {
-      trigger.classList.add('dot-highlight');
-      setTimeout(() => {
-        trigger.classList.remove('dot-highlight');
+    document.addEventListener("keydown", function(ev) {
+      if (!g_modal.style.display || g_modal.style.display === "none") return;
+      switch(ev.keyCode) {
+        case 32: shootBullet(); break;
+        case 37: ship.rot = TURN_SPEED / 180 * Math.PI / FPS; break;
+        case 38: ship.thrusting = true; break;
+        case 39: ship.rot = -TURN_SPEED / 180 * Math.PI / FPS; break;
+      }
+    });
+
+    document.addEventListener("keyup", function(ev) {
+      if (!g_modal.style.display || g_modal.style.display === "none") return;
+      switch(ev.keyCode) {
+        case 37: ship.rot = 0; break;
+        case 38: ship.thrusting = false; break;
+        case 39: ship.rot = 0; break;
+      }
+    });
+
+    setInterval(function() {
+      g_trigger.classList.add('dot-highlight');
+      setTimeout(function() {
+        g_trigger.classList.remove('dot-highlight');
       }, 1000);
-    }, 10000); // 10 seconds
+    }, 10000);
   </script>
 </body>
 </html>
