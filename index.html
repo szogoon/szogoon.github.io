@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Przemysław Małolepszy</title>
+  <link rel="preload" href="fonts/PhosphorNeo-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/PhosphorNeo-Bold.woff2" as="font" type="font/woff2" crossorigin>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VJVCR7MYB8"></script>
   <script>
@@ -14,6 +16,32 @@
     gtag('config', 'G-VJVCR7MYB8');
   </script>
   <style>
+    @font-face {
+      font-family: 'Phosphor Neo';
+      src: url('fonts/PhosphorNeo-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Phosphor Neo';
+      src: url('fonts/PhosphorNeo-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    /* Matrix phosphor palette */
+    :root {
+      --bg: #030505;
+      --panel: #050a09;
+      --text: #8cffdf;
+      --bright: #c8fff4;
+      --dim: #3fa585;
+      --glow: #2bffb8;
+      --border: rgba(43, 255, 184, 0.25);
+      --border-soft: rgba(43, 255, 184, 0.12);
+    }
+
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
@@ -25,36 +53,63 @@
     }
 
     body {
-      background: #0d1117;
+      background: var(--bg);
       height: 100%;
       height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Phosphor Neo', 'Courier New', Courier, monospace;
       overflow: hidden;
     }
 
     .terminal {
+      position: relative;
       width: 100%;
       max-width: 800px;
       max-height: calc(100% - 48px);
       display: flex;
       flex-direction: column;
-      border: 1px solid #30363d;
+      border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(43, 255, 184, 0.08);
+      animation: crt-flicker 0.15s infinite;
+    }
+
+    /* CRT scanlines over the whole window */
+    .terminal::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.18) 2px 3px);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* CRT vignette */
+    .terminal::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 65%, rgba(0, 0, 0, 0.55) 100%);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    @keyframes crt-flicker {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.97; }
     }
 
     .titlebar {
-      background: #161b22;
+      background: var(--panel);
       padding: 12px 16px;
       display: flex;
       align-items: center;
       gap: 8px;
-      border-bottom: 1px solid #30363d;
+      border-bottom: 1px solid var(--border-soft);
       flex-shrink: 0;
     }
 
@@ -94,12 +149,12 @@
 
     .modal-content {
       position: relative;
-      background-color: #0d1117;
+      background-color: var(--bg);
       padding: 20px;
-      border: 1px solid #30363d;
+      border: 1px solid var(--border);
       border-radius: 10px;
       text-align: center;
-      color: #c9d1d9;
+      color: var(--text);
       max-width: 95vw;
       max-height: 95vh;
       overflow-y: auto;
@@ -109,7 +164,7 @@
       position: absolute;
       top: 10px;
       right: 20px;
-      color: #8b949e;
+      color: var(--dim);
       font-size: 28px;
       font-weight: bold;
       cursor: pointer;
@@ -119,7 +174,7 @@
 
     #asteroids-canvas {
       background: #000;
-      border: 1px solid #30363d;
+      border: 1px solid var(--border);
       display: block;
       margin: 10px auto;
       max-width: 100%;
@@ -128,7 +183,7 @@
     #game-instructions {
       margin-top: 10px;
       font-size: 14px;
-      color: #8b949e;
+      color: var(--dim);
     }
 
     #mobile-controls {
@@ -146,21 +201,25 @@
     }
 
     .titlebar-label {
-      color: #8b949e;
+      color: var(--dim);
       font-size: 12px;
       margin-left: 8px;
     }
 
     .body {
-      background: #0d1117;
-      color: #c9d1d9;
+      background: var(--bg);
+      color: var(--text);
       padding: 28px 32px;
       font-size: 15px;
       line-height: 1.7;
       flex: 1;
       overflow-y: auto;
       scrollbar-width: thin;
-      scrollbar-color: #30363d transparent;
+      scrollbar-color: var(--border) transparent;
+      /* phosphor glow */
+      text-shadow:
+        0 0 2px rgba(43, 255, 184, 0.6),
+        0 0 8px rgba(43, 255, 184, 0.35);
     }
 
     .body::-webkit-scrollbar {
@@ -168,23 +227,23 @@
     }
 
     .body::-webkit-scrollbar-thumb {
-      background: #30363d;
+      background: var(--border);
       border-radius: 4px;
     }
 
     /* shared content styles */
-    .comment  { color: #6e7681; }
-    .prompt   { color: #3fb950; }
-    .cmd      { color: #c9d1d9; }
-    .divider  { border: none; border-top: 1px solid #21262d; margin: 16px 0; }
+    .comment  { color: var(--dim); }
+    .prompt   { color: var(--glow); }
+    .cmd      { color: var(--text); white-space: break-spaces; } /* keep typed spaces, incl. trailing */
+    .divider  { border: none; border-top: 1px solid var(--border-soft); margin: 16px 0; }
     .line     { margin: 10px 0; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; position: relative; }
 
     /* whoami output */
-    .name  { color: #58a6ff; font-size: 22px; font-weight: bold; display: block; margin: 2px 0; }
-    .title { color: #8b949e; display: block; }
+    .name  { color: var(--bright); font-size: 22px; font-weight: bold; display: block; margin: 2px 0; }
+    .title { color: var(--dim); display: block; }
 
     /* about output */
-    .bio { color: #c9d1d9; display: block; margin: 2px 0; }
+    .bio { color: var(--text); display: block; margin: 2px 0; }
     .bio-gap { margin-top: 8px; }
 
     /* skills tags */
@@ -192,28 +251,28 @@
 
     .tag {
       display: inline-block;
-      background: #161b22;
-      border: 1px solid #30363d;
-      color: #8b949e;
+      background: var(--panel);
+      border: 1px solid var(--border-soft);
+      color: var(--dim);
       font-size: 12px;
       padding: 1px 8px;
       border-radius: 4px;
     }
 
     .tag-primary {
-      border-color: #3fb950;
-      color: #3fb950;
+      border-color: var(--glow);
+      color: var(--glow);
     }
 
     /* links */
     .links { margin-top: 4px; display: flex; gap: 24px; flex-wrap: wrap; }
 
     .links a {
-      color: #3fb950;
+      color: var(--glow);
       text-decoration: none;
     }
 
-    .links a:hover { color: #58a6ff; }
+    .links a:hover { color: var(--bright); text-decoration: underline; }
 
     #terminal-input {
       position: absolute;
@@ -232,7 +291,8 @@
       display: inline-block;
       width: 9px;
       height: 16px;
-      background: #58a6ff;
+      background: var(--text);
+      box-shadow: 0 0 6px var(--glow);
       margin: auto 0;
       animation: blink 1s step-end infinite;
     }
@@ -240,6 +300,10 @@
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50%       { opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .terminal { animation: none; }
     }
 
     @media (max-width: 800px) {
@@ -317,7 +381,7 @@
       </div>
 
       <div class="line">
-        <span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd" id="input-display"></span><span class="cursor"></span>
+        <span class="prompt">visitor@web</span><span class="cmd" id="prompt-path">:~$</span> <span class="cmd" id="input-display"></span><span class="cursor"></span>
         <input type="text" id="terminal-input" autofocus autocomplete="off" spellcheck="false">
       </div>
     </div>
@@ -327,12 +391,12 @@
   <div id="game-modal" class="modal">
     <div class="modal-content">
       <span class="close-button" id="close-game">&times;</span>
-      <h2 style="margin-bottom: 10px; color: #58a6ff;">Asteroids</h2>
-      <div id="game-score" style="font-size: 20px; color: #3fb950; margin-bottom: 10px;">Score: 0</div>
+      <h2 style="margin-bottom: 10px; color: var(--bright);">Asteroids</h2>
+      <div id="game-score" style="font-size: 20px; color: var(--glow); margin-bottom: 10px;">Score: 0</div>
       <div id="game-over" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(13, 17, 23, 0.9); padding: 20px; border: 2px solid #ff5f56; border-radius: 10px; z-index: 10;">
         <h3 style="color: #ff5f56; margin-bottom: 10px;">GAME OVER</h3>
-        <p id="final-score" style="color: #c9d1d9; margin-bottom: 20px;"></p>
-        <button id="restart-game" style="background: #238636; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-family: inherit;">Restart</button>
+        <p id="final-score" style="color: var(--text); margin-bottom: 20px;"></p>
+        <button id="restart-game" style="background: transparent; color: var(--glow); border: 1px solid var(--glow); padding: 10px 20px; border-radius: 5px; cursor: pointer; font-family: inherit;">Restart</button>
       </div>
       <canvas id="asteroids-canvas" width="700" height="500"></canvas>
       <div id="game-instructions">
@@ -356,27 +420,13 @@
     var terminalHistory = document.getElementById('terminal-history');
     var terminalInput = document.getElementById('terminal-input');
     var inputDisplay = document.getElementById('input-display');
+    var promptPath = document.getElementById('prompt-path');
 
-    var commands = {
-      'whoami': function() {
-        return '<span class="name">Przemysław Małolepszy</span>' +
-               '<span class="title">Full Stack Software Engineer</span>';
-      },
-      'ls': function(args) {
-        var path = args[0] || '';
-        if (path === 'links' || path === 'links/') {
-          return '<div class="links">' +
-                 '<a href="https://github.com/szogoon" target="_blank" rel="noopener noreferrer">github.com/szogoon</a>' +
-                 '<a href="https://www.linkedin.com/in/przemyslaw-malolepszy-68050513a/" target="_blank" rel="noopener noreferrer">linkedin</a>' +
-                 '<a href="https://stackoverflow.com/users/8119084/szogoon" target="_blank" rel="noopener noreferrer">stackoverflow</a>' +
-                 '<a href="mailto:szogoon@gmail.com">szogoon@gmail.com</a>' +
-                 '</div>';
-        }
-        return '<div class="line">about.txt  skills.txt  links/</div>';
-      },
-      'cat': function(args) {
-        var file = args[0];
-        if (file === 'about.txt') {
+    // Virtual home directory. A dir's `listing` overrides the default name list in `ls`.
+    var fileSystem = {
+      type: 'dir',
+      children: {
+        'about.txt': { type: 'file', content: function() {
           return '<span class="bio">Started out as a sysadmin — Windows &amp; Linux servers,</span>' +
                  '<span class="bio">Active Directory, Exchange, Postfix, MySQL.</span>' +
                  '<span class="bio">Grew into software engineering from the ground up.</span>' +
@@ -384,8 +434,8 @@
                  '<span class="bio">with AI integrated into my day-to-day workflow.</span>' +
                  '<span class="bio">I don\'t just write code — I set up services, maintain</span>' +
                  '<span class="bio">them, and know what happens when they break.</span>';
-        }
-        if (file === 'skills.txt') {
+        } },
+        'skills.txt': { type: 'file', content: function() {
           return '<div class="tags">' +
                  '<span class="tag tag-primary">Go</span>' +
                  '<span class="tag tag-primary">TypeScript</span>' +
@@ -398,19 +448,108 @@
                  '<span class="tag">Exchange</span>' +
                  '<span class="tag">Postman</span>' +
                  '</div>';
+        } },
+        'links': { type: 'dir', children: {}, listing: function() {
+          return '<div class="links">' +
+                 '<a href="https://github.com/szogoon" target="_blank" rel="noopener noreferrer">github.com/szogoon</a>' +
+                 '<a href="https://www.linkedin.com/in/przemyslaw-malolepszy-68050513a/" target="_blank" rel="noopener noreferrer">linkedin</a>' +
+                 '<a href="https://stackoverflow.com/users/8119084/szogoon" target="_blank" rel="noopener noreferrer">stackoverflow</a>' +
+                 '<a href="mailto:szogoon@gmail.com">szogoon@gmail.com</a>' +
+                 '</div>';
+        } }
+      }
+    };
+
+    // Current directory as path segments below ~ (empty = home).
+    var cwd = [];
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                 .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function formatPath(segments) {
+      return segments.length ? '~/' + segments.join('/') : '~';
+    }
+
+    function updatePrompt() {
+      promptPath.textContent = ':' + formatPath(cwd) + '$';
+    }
+
+    // Resolves a path against cwd; returns { node, segments } or null if it doesn't exist.
+    function resolvePath(path) {
+      if (path.charAt(0) === '/') return null;
+      var segments = path.charAt(0) === '~' ? [] : cwd.slice();
+      var parts = path.replace(/^~/, '').split('/');
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i] === '' || parts[i] === '.') continue;
+        if (parts[i] === '..') segments.pop();
+        else segments.push(parts[i]);
+      }
+      var node = fileSystem;
+      for (var j = 0; j < segments.length; j++) {
+        if (node.type !== 'dir' || !Object.prototype.hasOwnProperty.call(node.children, segments[j])) return null;
+        node = node.children[segments[j]];
+      }
+      return { node: node, segments: segments };
+    }
+
+    function listDir(dir) {
+      if (dir.listing) return dir.listing();
+      var names = Object.keys(dir.children).map(function(name) {
+        return dir.children[name].type === 'dir' ? name + '/' : name;
+      });
+      return '<div class="line">' + names.join('  ') + '</div>';
+    }
+
+    var commands = {
+      'whoami': function() {
+        return '<span class="name">Przemysław Małolepszy</span>' +
+               '<span class="title">Full Stack Software Engineer</span>';
+      },
+      'ls': function(args) {
+        var path = args[0] || '.';
+        var target = resolvePath(path);
+        if (!target) {
+          return '<div class="line">ls: cannot access \'' + escapeHtml(path) + '\': No such file or directory</div>';
         }
-        if (file === 'links' || file === 'links/') {
-          return '<div class="line">cat: links/: Is a directory</div>';
+        if (target.node.type === 'file') {
+          return '<div class="line">' + escapeHtml(path) + '</div>';
         }
+        return listDir(target.node);
+      },
+      'cd': function(args) {
+        if (args.length > 1) return '<div class="line">bash: cd: too many arguments</div>';
+        var path = args[0] || '~';
+        var target = resolvePath(path);
+        if (!target) {
+          return '<div class="line">bash: cd: ' + escapeHtml(path) + ': No such file or directory</div>';
+        }
+        if (target.node.type !== 'dir') {
+          return '<div class="line">bash: cd: ' + escapeHtml(path) + ': Not a directory</div>';
+        }
+        cwd = target.segments;
+        updatePrompt();
+        return '';
+      },
+      'cat': function(args) {
+        var file = args[0];
         if (!file) return '';
-        return '<div class="line">cat: ' + file + ': No such file or directory</div>';
+        var target = resolvePath(file);
+        if (!target) {
+          return '<div class="line">cat: ' + escapeHtml(file) + ': No such file or directory</div>';
+        }
+        if (target.node.type === 'dir') {
+          return '<div class="line">cat: ' + escapeHtml(file) + ': Is a directory</div>';
+        }
+        return target.node.content();
       },
       'clear': function() {
         terminalHistory.innerHTML = '';
         return null;
       },
       'help': function() {
-        return '<div class="line">Available commands: whoami, ls, cat, clear, game, help, ?, mobile</div>';
+        return '<div class="line">Available commands: whoami, ls, cd, cat, clear, game, help, ?, mobile</div>';
       },
       '?': function() {
         return this.help();
@@ -458,11 +597,13 @@
     terminalInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         var input = terminalInput.value;
+        // Capture the prompt before running the command, since cd changes it.
+        var promptText = ':' + formatPath(cwd) + '$';
         var output = handleCommand(input);
 
         var commandLine = document.createElement('div');
         commandLine.className = 'line';
-        commandLine.innerHTML = '<span class="prompt">visitor@web</span><span class="cmd">:~$</span> <span class="cmd">' + input + '</span>';
+        commandLine.innerHTML = '<span class="prompt">visitor@web</span><span class="cmd">' + promptText + '</span> <span class="cmd">' + escapeHtml(input) + '</span>';
         terminalHistory.appendChild(commandLine);
 
         if (output !== null) {
@@ -503,7 +644,7 @@
       " |_|  |_|\\___|_|_|\\___/  |_| |_|\\__,_|\\___|_|\\_\\___|_|   \n" +
       "\n" +
       "                    pls don't hurt me... (v_v)",
-      "color: #58a6ff; font-weight: bold; font-family: monospace;"
+      "color: #2bffb8; font-weight: bold; font-family: monospace;"
     );
 
     // Asteroids Game Logic
