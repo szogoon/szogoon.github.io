@@ -180,7 +180,28 @@
       max-width: 100%;
     }
 
-    #game-instructions {
+    #drive-map-wrap {
+      position: relative;
+      width: 700px;
+      height: 500px;
+      max-width: 100%;
+      margin: 10px auto;
+      border: 1px solid var(--border);
+      background: #000;
+    }
+
+    #drive-map {
+      position: absolute;
+      inset: 0;
+    }
+
+    #drive-status {
+      font-size: 20px;
+      color: var(--glow);
+      margin-bottom: 10px;
+    }
+
+    #game-instructions, #drive-instructions {
       margin-top: 10px;
       font-size: 14px;
       color: var(--dim);
@@ -415,6 +436,21 @@
     </div>
   </div>
 
+  <!-- Drive Modal -->
+  <div id="drive-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-button" id="close-drive">&times;</span>
+      <h2 style="margin-bottom: 10px; color: var(--bright);">Drive</h2>
+      <div id="drive-status">Loading map...</div>
+      <div id="drive-map-wrap">
+        <div id="drive-map"></div>
+      </div>
+      <div id="drive-instructions">
+        &uarr; Accelerate | &darr; Brake / Reverse | &larr; &rarr; Steer
+      </div>
+    </div>
+  </div>
+
   <script>
     var terminalBody = document.getElementById('terminal-body');
     var terminalHistory = document.getElementById('terminal-history');
@@ -549,7 +585,7 @@
         return null;
       },
       'help': function() {
-        return '<div class="line">Available commands: whoami, ls, cd, cat, clear, game, help, ?, mobile</div>';
+        return '<div class="line">Available commands: whoami, ls, cd, cat, clear, game, drive, help, ?, mobile</div>';
       },
       '?': function() {
         return this.help();
@@ -557,6 +593,11 @@
       'game': function() {
         openAsteroidsGame();
         return '<div class="line">Launching terminal game... (Use arrow keys to move, Space to fire)</div>';
+      },
+
+      'drive': function() {
+        openDriveGame();
+        return '<div class="line">Starting engine at Brama Miasta, Łódź... (Use arrow keys to drive)</div>';
       },
       'mobile': function() {
         document.body.classList.toggle('mobile-ui');
@@ -626,7 +667,7 @@
 
     ['click', 'touchstart'].forEach(function(event) {
       document.addEventListener(event, function() {
-        if (!g_modal.style.display || g_modal.style.display === "none") {
+        if ((!g_modal.style.display || g_modal.style.display === "none") && !isDriveOpen()) {
           terminalInput.focus();
         }
       });
@@ -943,6 +984,320 @@
         g_trigger.classList.remove('dot-highlight');
       }, 1000);
     }, 10000);
+
+    // Drive Game Logic (TomTom Maps SDK, loaded from the CDN on first launch)
+    // Key is restricted to Maps; it is public by nature, so lock it to the site's domain.
+    const TOMTOM_API_KEY = '8QUDkbcqJdRUz0GS7fv4JPJ9AqqWescy';
+    const TOMTOM_SDK_URL = 'https://cdn.jsdelivr.net/npm/@tomtom-org/maps-sdk@1.0.0-rc.5';
+    const MAPLIBRE_CSS_URL = 'https://cdn.jsdelivr.net/npm/maplibre-gl@6.15.0/dist/maplibre-gl.css';
+    // [lng, lat] on Kilińskiego, facing north with Brama Miasta (Łódź) ahead on the right;
+    // the building itself is extruded, so starting on its point would hide the car inside it
+    const DRIVE_START = [19.464774, 51.768324];
+    const DRIVE_START_HEADING = 343;
+    const DRIVE_ZOOM = 19;
+    const DRIVE_PITCH = 65;      // deg; the style's "3D - Building" layer extrudes once tilted
+    const DRIVE_CAR_Y = 0.7;     // chase cam: car sits at 70% of the map's height
+    // Car as extruded boxes in local meters: x to the right, y forward
+    const CAR_PARTS = [
+      { x: [-1.1, 1.1], y: [-2.4, 2.4], base: 0.3, height: 1.1, color: '#2bffb8' },  // body
+      { x: [-0.9, 0.9], y: [-1.4, 0.8], base: 1.1, height: 1.7, color: '#0b2a22' },  // cabin
+      { x: [0.5, 0.95], y: [2.3, 2.5], base: 0.6, height: 0.9, color: '#c8fff4' },   // headlights
+      { x: [-0.95, -0.5], y: [2.3, 2.5], base: 0.6, height: 0.9, color: '#c8fff4' },
+      { x: [0.4, 1.0], y: [-2.5, -2.3], base: 0.7, height: 1.0, color: '#ff5f56' },  // tail lights
+      { x: [-1.0, -0.4], y: [-2.5, -2.3], base: 0.7, height: 1.0, color: '#ff5f56' }
+    ];
+    const DRIVE_ACCEL = 8;       // m/s² while holding up
+    const DRIVE_BRAKE = 14;      // m/s² while holding down (then reverses)
+    const DRIVE_DRAG = 2;        // m/s² when coasting
+    const DRIVE_MAX_SPEED = 40;  // m/s (~144 km/h)
+    const DRIVE_MAX_REVERSE = 8; // m/s
+    const DRIVE_TURN = 90;       // deg/s at full grip
+    const METERS_PER_DEG_LAT = 111320;
+    // Body corners plus mid-sides, so a narrow building corner can't slip between the test points
+    const CAR_HITBOX = [[-1.1, 2.4], [0, 2.4], [1.1, 2.4], [1.1, 0], [1.1, -2.4], [0, -2.4], [-1.1, -2.4], [-1.1, 0]];
+    const BUILDING_FILTER = ['all',
+      ['!=', ['get', 'underground'], true],
+      ['!=', ['get', 'has_part'], true],
+      ['!=', ['get', 'extrude'], false]
+    ];
+    const CRASH_BOUNCE = 0.3;    // fraction of speed kept, reversed, after a hit
+    const CRASH_FLASH_MS = 600;
+
+    const d_modal = document.getElementById('drive-modal');
+    const d_status = document.getElementById('drive-status');
+    let d_map = null, d_loading = null, d_loop = null, d_lastTime = 0;
+    let d_car = null;
+    let d_baseSource = null, d_buildings = [], d_buildingsAge = Infinity, d_crashUntil = 0;
+    const d_keys = { up: false, down: false, left: false, right: false };
+
+    function isDriveOpen() {
+      return d_modal.style.display === 'flex';
+    }
+
+    function loadDriveMap() {
+      if (d_loading) return d_loading;
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = MAPLIBRE_CSS_URL;
+      document.head.appendChild(css);
+      d_loading = Promise.all([
+        import(TOMTOM_SDK_URL + '/core/+esm'),
+        import(TOMTOM_SDK_URL + '/map/+esm')
+      ]).then(function(modules) {
+        modules[0].TomTomConfig.instance.put({ apiKey: TOMTOM_API_KEY });
+        d_map = new modules[1].TomTomMap({
+          registerMapLibreWorker: false,
+          style: 'monoDark',
+          mapLibre: {
+            container: 'drive-map',
+            center: DRIVE_START,
+            zoom: DRIVE_ZOOM,
+            pitch: DRIVE_PITCH,
+            maxPitch: 70,
+            interactive: false
+          }
+        });
+        // 3D buildings ship hidden in the style; get() also waits until the map is ready
+        return modules[1].BaseMapModule.get(d_map, {
+          groups: { buildings3D: { visible: true } }
+        }).then(function() {
+          d_baseSource = modules[1].BASE_MAP_SOURCE_ID;
+          addCarLayer(d_map.mapLibreMap);
+          return d_map;
+        });
+      });
+      // Allow a retry on the next launch if the CDN or SDK failed
+      d_loading.catch(function() { d_loading = null; });
+      return d_loading;
+    }
+
+    function addCarLayer(mlMap) {
+      mlMap.addSource('drive-car', { type: 'geojson', data: carGeoJSON() });
+      mlMap.addLayer({
+        id: 'drive-car',
+        type: 'fill-extrusion',
+        source: 'drive-car',
+        paint: {
+          'fill-extrusion-color': ['get', 'color'],
+          'fill-extrusion-base': ['get', 'base'],
+          'fill-extrusion-height': ['get', 'height'],
+          'fill-extrusion-opacity': 1
+        }
+      });
+      // Dark horizon so the tilted view fades out instead of ending in a hard edge
+      mlMap.setSky({
+        'sky-color': '#030505',
+        'horizon-color': '#0b2a22',
+        'fog-color': '#030505',
+        'sky-horizon-blend': 0.5,
+        'horizon-fog-blend': 0.6,
+        'fog-ground-blend': 0.3
+      });
+    }
+
+    // Converts a meter offset in the car's frame (x right, y forward) to lng/lat
+    function carPoint(x, y) {
+      const rad = d_car.heading * Math.PI / 180;
+      const east = x * Math.cos(rad) + y * Math.sin(rad);
+      const north = -x * Math.sin(rad) + y * Math.cos(rad);
+      const mPerLng = METERS_PER_DEG_LAT * Math.cos(d_car.lat * Math.PI / 180);
+      return [d_car.lng + east / mPerLng, d_car.lat + north / METERS_PER_DEG_LAT];
+    }
+
+    function carGeoJSON() {
+      return {
+        type: 'FeatureCollection',
+        features: CAR_PARTS.map(function(p) {
+          return {
+            type: 'Feature',
+            properties: { base: p.base, height: p.height, color: p.color },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                carPoint(p.x[0], p.y[0]), carPoint(p.x[1], p.y[0]),
+                carPoint(p.x[1], p.y[1]), carPoint(p.x[0], p.y[1]),
+                carPoint(p.x[0], p.y[0])
+              ]]
+            }
+          };
+        })
+      };
+    }
+
+    // Collision: building footprints near the car are pulled from the loaded vector tiles
+    // with the same filter as the style's "3D - Building" layer, then hit-tested in lng/lat.
+    // (Screen-space picking would also hit towers that merely overlap the car in the tilted view.)
+    function refreshBuildings() {
+      const mlMap = d_map.mapLibreMap;
+      const near = 0.003; // ~200 m; plenty for half a second at top speed
+      d_buildings = [];
+      mlMap.querySourceFeatures(d_baseSource, { sourceLayer: 'buildings', filter: BUILDING_FILTER }).forEach(function(f) {
+        const polygons = f.geometry.type === 'Polygon' ? [f.geometry.coordinates]
+                       : f.geometry.type === 'MultiPolygon' ? f.geometry.coordinates : [];
+        polygons.forEach(function(rings) {
+          const bbox = ringBBox(rings[0]);
+          if (bbox[0] > d_car.lng + near || bbox[2] < d_car.lng - near ||
+              bbox[1] > d_car.lat + near || bbox[3] < d_car.lat - near) return;
+          d_buildings.push({ rings: rings, bbox: bbox });
+        });
+      });
+    }
+
+    function ringBBox(ring) {
+      const bbox = [Infinity, Infinity, -Infinity, -Infinity];
+      ring.forEach(function(p) {
+        bbox[0] = Math.min(bbox[0], p[0]); bbox[1] = Math.min(bbox[1], p[1]);
+        bbox[2] = Math.max(bbox[2], p[0]); bbox[3] = Math.max(bbox[3], p[1]);
+      });
+      return bbox;
+    }
+
+    // Ray casting; works directly on lng/lat at this scale
+    function pointInRing(p, ring) {
+      let inside = false;
+      for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        if ((ring[i][1] > p[1]) !== (ring[j][1] > p[1]) &&
+            p[0] < (ring[j][0] - ring[i][0]) * (p[1] - ring[i][1]) / (ring[j][1] - ring[i][1]) + ring[i][0]) {
+          inside = !inside;
+        }
+      }
+      return inside;
+    }
+
+    function carHitsBuilding() {
+      return CAR_HITBOX.some(function(offset) {
+        const p = carPoint(offset[0], offset[1]);
+        return d_buildings.some(function(b) {
+          if (p[0] < b.bbox[0] || p[0] > b.bbox[2] || p[1] < b.bbox[1] || p[1] > b.bbox[3]) return false;
+          // Inside the outline and not inside one of its holes (courtyards)
+          return pointInRing(p, b.rings[0]) && !b.rings.slice(1).some(function(hole) { return pointInRing(p, hole); });
+        });
+      });
+    }
+
+    function resetCar() {
+      d_car = { lng: DRIVE_START[0], lat: DRIVE_START[1], heading: DRIVE_START_HEADING, speed: 0 };
+      for (const k in d_keys) d_keys[k] = false;
+      d_crashUntil = 0;
+      d_buildingsAge = Infinity;
+    }
+
+    function updateCar(dt) {
+      if (d_keys.up) {
+        d_car.speed += (d_car.speed < 0 ? DRIVE_BRAKE : DRIVE_ACCEL) * dt;
+      } else if (d_keys.down) {
+        d_car.speed -= (d_car.speed > 0 ? DRIVE_BRAKE : DRIVE_ACCEL) * dt;
+      } else {
+        const drag = DRIVE_DRAG * dt;
+        d_car.speed = Math.abs(d_car.speed) <= drag ? 0 : d_car.speed - Math.sign(d_car.speed) * drag;
+      }
+      d_car.speed = Math.max(-DRIVE_MAX_REVERSE, Math.min(DRIVE_MAX_SPEED, d_car.speed));
+
+      // Steering needs motion; grip ramps up to full by 5 m/s, and flips in reverse like a real car
+      const steer = (d_keys.right ? 1 : 0) - (d_keys.left ? 1 : 0);
+      const grip = Math.min(1, Math.abs(d_car.speed) / 5) * Math.sign(d_car.speed);
+      d_car.heading = (d_car.heading + steer * grip * DRIVE_TURN * dt + 360) % 360;
+
+      const dist = d_car.speed * dt;
+      const rad = d_car.heading * Math.PI / 180;
+      d_car.lat += dist * Math.cos(rad) / METERS_PER_DEG_LAT;
+      d_car.lng += dist * Math.sin(rad) / (METERS_PER_DEG_LAT * Math.cos(d_car.lat * Math.PI / 180));
+    }
+
+    // Moves the car one step; on a hit it undoes the step (including the turn) and bounces back
+    function stepCar(dt, time) {
+      const prev = { lng: d_car.lng, lat: d_car.lat, heading: d_car.heading };
+      updateCar(dt);
+      if (!carHitsBuilding()) return;
+      const next = { lng: d_car.lng, lat: d_car.lat, heading: d_car.heading };
+      d_car.lng = prev.lng;
+      d_car.lat = prev.lat;
+      d_car.heading = prev.heading;
+      // Already overlapping before this step (e.g. misaligned data): let it drive out instead of sticking
+      if (carHitsBuilding()) {
+        Object.assign(d_car, next);
+        return;
+      }
+      if (Math.abs(d_car.speed) > 1) d_crashUntil = time + CRASH_FLASH_MS;
+      d_car.speed = -d_car.speed * CRASH_BOUNCE;
+    }
+
+    function driveFrame(time) {
+      // Clamp dt so a backgrounded tab doesn't teleport the car
+      const dt = Math.min(0.1, (time - d_lastTime) / 1000);
+      d_lastTime = time;
+      d_buildingsAge += dt;
+      if (d_buildingsAge > 0.5) {
+        refreshBuildings();
+        d_buildingsAge = 0;
+      }
+      stepCar(dt, time);
+      const mlMap = d_map.mapLibreMap;
+      mlMap.getSource('drive-car').setData(carGeoJSON());
+      // Top padding pushes the camera's focus point (the car) down the screen
+      const height = mlMap.getContainer().clientHeight;
+      mlMap.jumpTo({
+        center: [d_car.lng, d_car.lat],
+        bearing: d_car.heading,
+        pitch: DRIVE_PITCH,
+        padding: { top: (2 * DRIVE_CAR_Y - 1) * height, bottom: 0, left: 0, right: 0 }
+      });
+      const crashed = time < d_crashUntil;
+      d_status.innerText = crashed ? 'CRASH!' : 'Speed: ' + Math.round(Math.abs(d_car.speed) * 3.6) + ' km/h' + (d_car.speed < 0 ? ' (R)' : '');
+      d_status.style.color = crashed ? '#ff5f56' : '';
+      d_loop = requestAnimationFrame(driveFrame);
+    }
+
+    function openDriveGame() {
+      d_modal.style.display = 'flex';
+      terminalInput.blur();
+      resetCar();
+      if (!TOMTOM_API_KEY) {
+        d_status.innerText = 'No TomTom API key configured';
+        return;
+      }
+      d_status.innerText = 'Loading map...';
+      loadDriveMap().then(function(map) {
+        if (!isDriveOpen()) return;
+        map.mapLibreMap.resize();
+        d_lastTime = performance.now();
+        d_loop = requestAnimationFrame(driveFrame);
+      }).catch(function(err) {
+        console.error(err);
+        d_status.innerText = 'Map failed to load';
+      });
+    }
+
+    function closeDriveGame() {
+      d_modal.style.display = 'none';
+      if (d_loop) {
+        cancelAnimationFrame(d_loop);
+        d_loop = null;
+      }
+      terminalInput.focus();
+    }
+
+    document.getElementById('close-drive').onclick = closeDriveGame;
+    d_modal.addEventListener('click', function(event) {
+      if (event.target === d_modal) closeDriveGame();
+    });
+
+    const DRIVE_KEYS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+    document.addEventListener('keydown', function(ev) {
+      if (!isDriveOpen()) return;
+      if (ev.key === 'Escape') return closeDriveGame();
+      if (DRIVE_KEYS[ev.key]) {
+        ev.preventDefault();
+        d_keys[DRIVE_KEYS[ev.key]] = true;
+      }
+    });
+    document.addEventListener('keyup', function(ev) {
+      if (isDriveOpen() && DRIVE_KEYS[ev.key]) d_keys[DRIVE_KEYS[ev.key]] = false;
+    });
+    // Releasing keys while the window is unfocused never fires keyup
+    globalThis.addEventListener('blur', function() {
+      for (const k in d_keys) d_keys[k] = false;
+    });
 
     // Mobile Detection & Touch Controls
     var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
